@@ -12,7 +12,7 @@ RUN gradle clean build -x test
 # ============================
 # STAGE 2: Run con OpenJDK
 # ============================
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
