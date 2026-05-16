@@ -15,6 +15,7 @@ public class ArtistaController {
     @Autowired
     private IArtistaRepository artistaRepo;
 
+    // -------------------- POST --------------------
     @PostMapping(
         value = "/artista",
         consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -25,6 +26,7 @@ public class ArtistaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
+    // -------------------- GET TODOS --------------------
     @GetMapping(
         value = "/artistas",
         produces = MediaType.APPLICATION_JSON_VALUE
@@ -33,6 +35,7 @@ public class ArtistaController {
         return ResponseEntity.ok(artistaRepo.findAll());
     }
 
+    // -------------------- GET POR ID --------------------
     @GetMapping(
         value = "/artista/{id}",
         produces = MediaType.APPLICATION_JSON_VALUE
@@ -40,9 +43,13 @@ public class ArtistaController {
     public ResponseEntity<Object> HandleGetArtistaRequest(@PathVariable("id") String id) {
         return artistaRepo.findById(id)
                 .<ResponseEntity<Object>>map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Artista no encontrado"));
+                .orElseGet(() ->
+                        ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body("Artista no encontrado")
+                );
     }
 
+    // -------------------- PUT --------------------
     @PutMapping(
         value = "/artista/{id}",
         consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -56,11 +63,12 @@ public class ArtistaController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Artista no existe");
         }
 
-        artista._id = id;
+        artista.setId(id);
         Artista updated = artistaRepo.save(artista);
         return ResponseEntity.ok(updated);
     }
 
+    // -------------------- DELETE --------------------
     @DeleteMapping(
         value = "/artista/{id}",
         produces = MediaType.APPLICATION_JSON_VALUE
@@ -75,5 +83,3 @@ public class ArtistaController {
         return ResponseEntity.ok("Artista eliminado");
     }
 }
-
-

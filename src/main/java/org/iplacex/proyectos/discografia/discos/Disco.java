@@ -8,10 +8,51 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Disco {
 
     @Id
-    public String _id;
+    private String id;
 
-    public String titulo;
-    public int anioLanzamiento;
-    public String artistaId;
-    public List<String> canciones;
+    private String artistaId;
+    private String titulo;
+    private int anioLanzamiento;
+    private List<String> canciones;
+
+    // Getters y setters
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getArtistaId() {
+        return artistaId;
+    }
+
+    public void setArtistaId(String artistaId) {
+        this.artistaId = artistaId;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public int getAnioLanzamiento() {
+        return anioLanzamiento;
+    }
+
+    public void setAnioLanzamiento(int anioLanzamiento) {
+        this.anioLanzamiento = anioLanzamiento;
+    }
+
+    public List<String> getCanciones() {
+        return canciones;
+    }
+
+    public void setCanciones(List<String> canciones) {
+        this.canciones = canciones;
+    }
 }

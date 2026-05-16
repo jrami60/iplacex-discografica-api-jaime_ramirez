@@ -19,7 +19,7 @@ public class DiscoController {
     @Autowired
     private IArtistaRepository artistaRepo;
 
-    // -------------------- POST (NUEV0) --------------------
+    // -------------------- POST --------------------
     @PostMapping(
         value = "/disco",
         consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -27,7 +27,7 @@ public class DiscoController {
     )
     public ResponseEntity<Object> HandlePostDiscoRequest(@RequestBody Disco disco) {
 
-        if (!artistaRepo.existsById(disco.artistaId)) {
+        if (!artistaRepo.existsById(disco.getArtistaId())) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Artista no existe");
         }
 
@@ -35,7 +35,7 @@ public class DiscoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
-    // -------------------- GET (MOSTRAR TODOS) --------------------
+    // -------------------- GET TODOS --------------------
     @GetMapping(
         value = "/discos",
         produces = MediaType.APPLICATION_JSON_VALUE
@@ -44,7 +44,7 @@ public class DiscoController {
         return ResponseEntity.ok(discoRepo.findAll());
     }
 
-    // -------------------- GET (MOSTRAR POR ID) --------------------
+    // -------------------- GET POR ID --------------------
     @GetMapping(
         value = "/disco/{id}",
         produces = MediaType.APPLICATION_JSON_VALUE
@@ -52,10 +52,13 @@ public class DiscoController {
     public ResponseEntity<Object> HandleGetDiscoRequest(@PathVariable("id") String id) {
         return discoRepo.findById(id)
                 .<ResponseEntity<Object>>map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Disco no encontrado"));
+                .orElseGet(() ->
+                        ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body("Disco no encontrado")
+                );
     }
 
-    // -------------------- GET (MOSTRAR POR ARTISTA) --------------------
+    // -------------------- GET POR ARTISTA --------------------
     @GetMapping(
         value = "/artista/{id}/discos",
         produces = MediaType.APPLICATION_JSON_VALUE
@@ -64,7 +67,7 @@ public class DiscoController {
         return ResponseEntity.ok(discoRepo.findDiscosByArtistaId(idArtista));
     }
 
-    // -------------------- PUT (MODIFICAR) --------------------
+    // -------------------- PUT --------------------
     @PutMapping(
         value = "/disco/{id}",
         consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -74,20 +77,25 @@ public class DiscoController {
             @PathVariable("id") String id,
             @RequestBody Disco discoActualizado) {
 
-        return discoRepo.findById(id).map(disco -> {
+        return discoRepo.findById(id)
+                .<ResponseEntity<Object>>map(disco -> {
 
-            disco.titulo = discoActualizado.titulo;
-            disco.anioLanzamiento = discoActualizado.anioLanzamiento;
-            disco.artistaId = discoActualizado.artistaId;
-            disco.canciones = discoActualizado.canciones;
+                    disco.setTitulo(discoActualizado.getTitulo());
+                    disco.setAnioLanzamiento(discoActualizado.getAnioLanzamiento());
+                    disco.setArtistaId(discoActualizado.getArtistaId());
+                    disco.setCanciones(discoActualizado.getCanciones());
 
-            Disco saved = discoRepo.save(disco);
-            return ResponseEntity.ok((Object) saved);
+                    Disco saved = discoRepo.save(disco);
+                    return ResponseEntity.ok((Object) saved);
 
-        }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body((Object) "Disco no encontrado"));
+                })
+                .orElseGet(() ->
+                        ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body("Disco no encontrado")
+                );
     }
 
-    // -------------------- DELETE (ELIMINAR) --------------------
+    // -------------------- DELETE --------------------
     @DeleteMapping(
         value = "/disco/{id}",
         produces = MediaType.APPLICATION_JSON_VALUE
